@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
 import json
+from dataclasses import dataclass
 from pathlib import Path
 
 from fastq_and_ngs.pubmed_query import (
@@ -45,7 +45,9 @@ class VariantHit:
 def parse_vcf(path: Path) -> list[Variant]:
     """Read VCF records, splitting on any whitespace so space-aligned files also work."""
     variants: list[Variant] = []
-    for number, line in enumerate(Path(path).read_text(encoding="utf-8").splitlines(), start=1):
+    for number, line in enumerate(
+        Path(path).read_text(encoding="utf-8").splitlines(), start=1
+    ):
         if not line.strip() or line.startswith("#"):
             continue
         fields = line.split()
@@ -54,7 +56,9 @@ def parse_vcf(path: Path) -> list[Variant]:
         chrom, pos, vid, ref, alt = fields[:5]
         variants.append(Variant(chrom, int(pos), None if vid == "." else vid, ref, alt))
     if len(variants) < MIN_VARIANTS:
-        raise ValueError(f"VCF must hold at least {MIN_VARIANTS} variants, found {len(variants)}")
+        raise ValueError(
+            f"VCF must hold at least {MIN_VARIANTS} variants, found {len(variants)}"
+        )
     return variants
 
 
@@ -76,10 +80,14 @@ def position_dropped(variant: Variant, translation: str) -> bool:
 
 def _fetch_hit(query: str, email: str) -> dict:
     result = search_pubmed(query, MAX_LISTED, email)
-    articles = parse_articles(fetch_articles_xml(result.pmids, email)) if result.pmids else []
+    articles = (
+        parse_articles(fetch_articles_xml(result.pmids, email)) if result.pmids else []
+    )
     if result.pmids and not articles:
         # ponytail: also rejects a result made only of PubMed book records; parse those if it ever happens.
-        raise ValueError(f"PubMed returned no articles for PMIDs {result.pmids} (query {query!r})")
+        raise ValueError(
+            f"PubMed returned no articles for PMIDs {result.pmids} (query {query!r})"
+        )
     return {
         "count": result.count,
         "query_translation": result.query_translation,
@@ -96,10 +104,14 @@ def load_or_fetch_hits(
     """Search each variant, reusing cached queries; a failure part-way never changes the cache."""
     cache_file = Path(cache_path)
     cache: dict[str, dict] = (
-        json.loads(cache_file.read_text(encoding="utf-8")) if cache_file.exists() else {}
+        json.loads(cache_file.read_text(encoding="utf-8"))
+        if cache_file.exists()
+        else {}
     )
     queries = [build_query(variant) for variant in variants]
-    missing = [query for query in dict.fromkeys(queries) if refresh or query not in cache]
+    missing = [
+        query for query in dict.fromkeys(queries) if refresh or query not in cache
+    ]
     if missing:
         cache.update({query: _fetch_hit(query, email) for query in missing})
         cache_file.parent.mkdir(parents=True, exist_ok=True)
@@ -139,14 +151,25 @@ def format_variants_report(hits: list[VariantHit]) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     """Write the variant search report."""
-    parser = argparse.ArgumentParser(description="Search PubMed for the variants in a VCF")
-    parser.add_argument("--vcf", type=Path, default=PROJECT_ROOT / "data/tp53_variants.vcf")
-    parser.add_argument("--refresh", action="store_true", help="Query PubMed instead of using the cache")
-    parser.add_argument("--email", default=DEFAULT_EMAIL, help="Email sent to NCBI Entrez")
+    parser = argparse.ArgumentParser(
+        description="Search PubMed for the variants in a VCF"
+    )
+    parser.add_argument(
+        "--vcf", type=Path, default=PROJECT_ROOT / "data/tp53_variants.vcf"
+    )
+    parser.add_argument(
+        "--refresh", action="store_true", help="Query PubMed instead of using the cache"
+    )
+    parser.add_argument(
+        "--email", default=DEFAULT_EMAIL, help="Email sent to NCBI Entrez"
+    )
     args = parser.parse_args(argv)
 
     hits = load_or_fetch_hits(
-        parse_vcf(args.vcf), PROJECT_ROOT / "data/variant_searches.json", refresh=args.refresh, email=args.email
+        parse_vcf(args.vcf),
+        PROJECT_ROOT / "data/variant_searches.json",
+        refresh=args.refresh,
+        email=args.email,
     )
     out = PROJECT_ROOT / f"results/variants_{HANDLE}.txt"
     out.parent.mkdir(parents=True, exist_ok=True)

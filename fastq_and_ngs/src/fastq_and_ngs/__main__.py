@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
 import shutil
 import subprocess
 import sys
 import tempfile
 import zipfile
+from pathlib import Path
 
 from fastq_and_ngs.ex04_fastq_stats import write_qc_outputs
 from fastq_and_ngs.pubmed_query import (
@@ -18,10 +18,16 @@ from fastq_and_ngs.pubmed_query import (
     format_pubmed_report,
     load_or_fetch_articles,
 )
-from fastq_and_ngs.vcf_pubmed import format_variants_report, load_or_fetch_hits, parse_vcf
+from fastq_and_ngs.vcf_pubmed import (
+    format_variants_report,
+    load_or_fetch_hits,
+    parse_vcf,
+)
 
 FASTQ_RELATIVE: str = f"data/work/{HANDLE}/lab03/your_reads.fastq.gz"
-FASTQ_SOURCE: str = "SRR31709504 read 1 (https://www.ebi.ac.uk/ena/browser/view/SRR31709504)"
+FASTQ_SOURCE: str = (
+    "SRR31709504 read 1 (https://www.ebi.ac.uk/ena/browser/view/SRR31709504)"
+)
 OUTPUTS: tuple[str, ...] = (
     f"pubmed_{HANDLE}.txt",
     f"fasta_{HANDLE}.fasta",
@@ -47,12 +53,18 @@ def _write_text(path: Path, text: str) -> None:
 def _run_task(root: Path, task: str, refresh: bool, email: str) -> None:
     results = root / "results"
     if task == "1":
-        articles = load_or_fetch_articles(root / "data/pubmed_tp53_cancer.xml", refresh=refresh, email=email)
+        articles = load_or_fetch_articles(
+            root / "data/pubmed_tp53_cancer.xml", refresh=refresh, email=email
+        )
         _write_text(results / f"pubmed_{HANDLE}.txt", format_pubmed_report(articles))
     elif task == "2":
         copy_fasta(root / "data/human_tp53.fa", results / f"fasta_{HANDLE}.fasta")
     elif task == "3":
-        write_qc_outputs(root / FASTQ_RELATIVE, results / f"qc_report_{HANDLE}.txt", results / f"qc_plot_{HANDLE}.png")
+        write_qc_outputs(
+            root / FASTQ_RELATIVE,
+            results / f"qc_report_{HANDLE}.txt",
+            results / f"qc_plot_{HANDLE}.png",
+        )
     elif task == "4":
         hits = load_or_fetch_hits(
             parse_vcf(root / "data/tp53_variants.vcf"),
@@ -69,7 +81,10 @@ def run_tasks(root: Path, task: str, refresh: bool, email: str) -> int:
     for current in ("1", "2", "3", "4") if task == "all" else (task,):
         if current == "3" and not (root / FASTQ_RELATIVE).exists():
             level = "Warning, skipping Task 3" if task == "all" else "Error"
-            print(f"{level}: {FASTQ_RELATIVE} is missing. Source: {FASTQ_SOURCE}", file=sys.stderr)
+            print(
+                f"{level}: {FASTQ_RELATIVE} is missing. Source: {FASTQ_SOURCE}",
+                file=sys.stderr,
+            )
             if task != "all":
                 code = 1
             continue
@@ -90,7 +105,9 @@ def _find_pdflatex() -> str:
     mac_tex = Path("/Library/TeX/texbin/pdflatex")
     if mac_tex.is_file():
         return str(mac_tex)
-    raise RuntimeError("pdflatex executable not found on PATH or /Library/TeX/texbin/pdflatex")
+    raise RuntimeError(
+        "pdflatex executable not found on PATH or /Library/TeX/texbin/pdflatex"
+    )
 
 
 def compile_notes_pdf(tex_path: Path, output_pdf: Path) -> Path:
@@ -163,26 +180,53 @@ def build_submission_zip(root: Path, output_zip: Path) -> Path:
 
 def main(argv: list[str] | None = None) -> int:
     """Run the Lab 03 pipeline and optional PDF/ZIP builders."""
-    parser = argparse.ArgumentParser(description="Lab 03 Formats and NGS Pipeline (Paul Hondola)")
-    parser.add_argument("--task", choices=("all", "1", "2", "3", "4"), default="all", help="Select one task or all")
-    parser.add_argument("--refresh", action="store_true", help="Re-query PubMed instead of using the cache in data/")
-    parser.add_argument("--email", default=DEFAULT_EMAIL, help="Email sent to NCBI Entrez with --refresh")
-    parser.add_argument("--pdf", action="store_true", help="Compile src/fastq_and_ngs/notes.tex into notes.pdf")
-    parser.add_argument("--zip", action="store_true", help=f"Package fastq_and_ngs_{HANDLE}.zip")
+    parser = argparse.ArgumentParser(
+        description="Lab 03 Formats and NGS Pipeline (Paul Hondola)"
+    )
+    parser.add_argument(
+        "--task",
+        choices=("all", "1", "2", "3", "4"),
+        default="all",
+        help="Select one task or all",
+    )
+    parser.add_argument(
+        "--refresh",
+        action="store_true",
+        help="Re-query PubMed instead of using the cache in data/",
+    )
+    parser.add_argument(
+        "--email",
+        default=DEFAULT_EMAIL,
+        help="Email sent to NCBI Entrez with --refresh",
+    )
+    parser.add_argument(
+        "--pdf",
+        action="store_true",
+        help="Compile src/fastq_and_ngs/notes.tex into notes.pdf",
+    )
+    parser.add_argument(
+        "--zip", action="store_true", help=f"Package fastq_and_ngs_{HANDLE}.zip"
+    )
     args = parser.parse_args(argv)
     if args.refresh and (args.pdf or args.zip):
-        parser.error("--refresh changes results that notes.tex hard-codes; update the notes before --pdf/--zip")
+        parser.error(
+            "--refresh changes results that notes.tex hard-codes; update the notes before --pdf/--zip"
+        )
 
     code = run_tasks(PROJECT_ROOT, args.task, args.refresh, args.email)
     if code != 0:
         return code
 
     if args.pdf:
-        pdf_out = compile_notes_pdf(Path(__file__).resolve().parent / "notes.tex", PROJECT_ROOT / "notes.pdf")
+        pdf_out = compile_notes_pdf(
+            Path(__file__).resolve().parent / "notes.tex", PROJECT_ROOT / "notes.pdf"
+        )
         print(f"Compiled report: {pdf_out}")
 
     if args.zip:
-        zip_out = build_submission_zip(PROJECT_ROOT, PROJECT_ROOT / f"fastq_and_ngs_{HANDLE}.zip")
+        zip_out = build_submission_zip(
+            PROJECT_ROOT, PROJECT_ROOT / f"fastq_and_ngs_{HANDLE}.zip"
+        )
         print(f"Created Moodle submission archive: {zip_out}")
 
     return 0

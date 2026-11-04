@@ -7,15 +7,15 @@ Pass --input, --report and --plot when running it outside this project's folders
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
 import gzip
+from dataclasses import dataclass
 from pathlib import Path
 
-from Bio import SeqIO
 import matplotlib
+from Bio import SeqIO
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
+import matplotlib.pyplot as plt
 
 HANDLE: str = "paulhondola"
 PROJECT_ROOT: Path = Path(__file__).resolve().parents[2]
@@ -85,7 +85,9 @@ def write_qc_plot(stats: FastqStats, out_png: Path) -> Path:
     ax1.set_ylabel("Număr citiri")
     ax1.grid(True, linestyle="--", alpha=0.5)
 
-    ax2.hist(stats.read_mean_phreds, bins=25, color="#2e7d32", edgecolor="black", alpha=0.8)
+    ax2.hist(
+        stats.read_mean_phreds, bins=25, color="#2e7d32", edgecolor="black", alpha=0.8
+    )
     ax2.set_title("Distribuția scorurilor Phred medii")
     ax2.set_xlabel("Scor Phred mediu per citire")
     ax2.set_ylabel("Număr citiri")
@@ -117,8 +119,12 @@ def main(argv: list[str] | None = None) -> int:
         type=Path,
         default=PROJECT_ROOT / f"data/work/{HANDLE}/lab03/your_reads.fastq.gz",
     )
-    parser.add_argument("--report", type=Path, default=PROJECT_ROOT / f"results/qc_report_{HANDLE}.txt")
-    parser.add_argument("--plot", type=Path, default=PROJECT_ROOT / f"results/qc_plot_{HANDLE}.png")
+    parser.add_argument(
+        "--report", type=Path, default=PROJECT_ROOT / f"results/qc_report_{HANDLE}.txt"
+    )
+    parser.add_argument(
+        "--plot", type=Path, default=PROJECT_ROOT / f"results/qc_plot_{HANDLE}.png"
+    )
     args = parser.parse_args(argv)
 
     stats = write_qc_outputs(args.input, args.report, args.plot)

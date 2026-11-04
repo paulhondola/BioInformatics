@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path
-import xml.etree.ElementTree as ET
 
 from Bio import Entrez
 
@@ -131,13 +131,21 @@ def format_pubmed_report(articles: list[Article]) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     """Write the PubMed report."""
-    parser = argparse.ArgumentParser(description="Save TP53 AND cancer articles from PubMed")
-    parser.add_argument("--refresh", action="store_true", help="Query PubMed instead of using the cache")
-    parser.add_argument("--email", default=DEFAULT_EMAIL, help="Email sent to NCBI Entrez")
+    parser = argparse.ArgumentParser(
+        description="Save TP53 AND cancer articles from PubMed"
+    )
+    parser.add_argument(
+        "--refresh", action="store_true", help="Query PubMed instead of using the cache"
+    )
+    parser.add_argument(
+        "--email", default=DEFAULT_EMAIL, help="Email sent to NCBI Entrez"
+    )
     args = parser.parse_args(argv)
 
     articles = load_or_fetch_articles(
-        PROJECT_ROOT / "data/pubmed_tp53_cancer.xml", refresh=args.refresh, email=args.email
+        PROJECT_ROOT / "data/pubmed_tp53_cancer.xml",
+        refresh=args.refresh,
+        email=args.email,
     )
     out = PROJECT_ROOT / f"results/pubmed_{HANDLE}.txt"
     out.parent.mkdir(parents=True, exist_ok=True)

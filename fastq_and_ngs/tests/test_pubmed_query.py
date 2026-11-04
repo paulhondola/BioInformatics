@@ -81,7 +81,9 @@ def test_uses_exact_query_and_cap_then_cache(tmp_path, monkeypatch):
 
 def test_refresh_refetches(tmp_path, monkeypatch):
     cache = tmp_path / "cache.xml"
-    cache.write_text("<PubmedArticleSet><PubmedArticle><MedlineCitation><PMID>9</PMID></MedlineCitation></PubmedArticle></PubmedArticleSet>")
+    cache.write_text(
+        "<PubmedArticleSet><PubmedArticle><MedlineCitation><PMID>9</PMID></MedlineCitation></PubmedArticle></PubmedArticleSet>"
+    )
     calls = _stub_network(monkeypatch)
     articles = load_or_fetch_articles(cache, refresh=True, email=EMAIL)
     assert len(calls) == 1
@@ -89,7 +91,9 @@ def test_refresh_refetches(tmp_path, monkeypatch):
     assert cache.read_text() == XML
 
 
-@pytest.mark.parametrize("reply", ["", "<not xml", "<PubmedArticleSet></PubmedArticleSet>"])
+@pytest.mark.parametrize(
+    "reply", ["", "<not xml", "<PubmedArticleSet></PubmedArticleSet>"]
+)
 def test_bad_reply_keeps_cache(tmp_path, monkeypatch, reply):
     cache = tmp_path / "cache.xml"
     cache.write_text(XML)

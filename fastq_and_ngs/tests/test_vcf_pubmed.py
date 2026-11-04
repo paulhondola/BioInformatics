@@ -47,7 +47,9 @@ def _stub_network(monkeypatch):
         return SearchResult(10, ["1", "2", "3"], f"translated {term}")
 
     monkeypatch.setattr(vcf_pubmed, "search_pubmed", search)
-    monkeypatch.setattr(vcf_pubmed, "fetch_articles_xml", lambda pmids, email: _articles_xml(pmids))
+    monkeypatch.setattr(
+        vcf_pubmed, "fetch_articles_xml", lambda pmids, email: _articles_xml(pmids)
+    )
     return searched
 
 
@@ -69,7 +71,9 @@ def test_committed_vcf_matches_spec():
 
 def test_parse_accepts_space_aligned_vcf(tmp_path):
     path = tmp_path / "v.vcf"
-    path.write_text("##x\n#CHROM POS ID REF ALT\n17   10  rs1  G C . PASS X\n17   20  .    A T . PASS X\n")
+    path.write_text(
+        "##x\n#CHROM POS ID REF ALT\n17   10  rs1  G C . PASS X\n17   20  .    A T . PASS X\n"
+    )
     assert [v.vid for v in parse_vcf(path)] == ["rs1", None]
 
 
@@ -90,7 +94,10 @@ def test_parse_rejects_short_line(tmp_path):
 def test_build_query():
     assert build_query(RS) == "rs5"
     assert build_query(NO_ID) == "chr17:7675091 AND TP53"
-    assert build_query(Variant("chr17", 7675091, None, "C", "G")) == "chr17:7675091 AND TP53"
+    assert (
+        build_query(Variant("chr17", 7675091, None, "C", "G"))
+        == "chr17:7675091 AND TP53"
+    )
     assert build_query(Variant("17", 1, "rs5;rs6", "A", "T")) == "rs5 OR rs6"
 
 
@@ -101,11 +108,21 @@ def test_position_dropped():
 
 
 def test_report_shows_translation_zero_hits_and_warning():
-    dropped = VariantHit(NO_ID, "chr17:7675091 AND TP53", DROPPED, 13, (("7", "A paper"),))
+    dropped = VariantHit(
+        NO_ID, "chr17:7675091 AND TP53", DROPPED, 13, (("7", "A paper"),)
+    )
     kept = VariantHit(NO_ID, "chr17:7675091 AND TP53", KEPT, 1, ())
     zero = VariantHit(RS, "rs5", '"rs5"[All Fields]', 0, ())
     text = format_variants_report([dropped, zero])
-    for needed in ("17:7675091 C>G", "chr17:7675091 AND TP53", DROPPED, "Hits: 13", "PMID 7: A paper", "Hits: 0", WARNING):
+    for needed in (
+        "17:7675091 C>G",
+        "chr17:7675091 AND TP53",
+        DROPPED,
+        "Hits: 13",
+        "PMID 7: A paper",
+        "Hits: 0",
+        WARNING,
+    ):
         assert needed in text
     assert text.count("PMID ") == 1
     assert WARNING not in format_variants_report([kept, zero])
@@ -126,7 +143,9 @@ def test_zero_hits_skip_article_fetch(tmp_path, monkeypatch):
     def fetch(pmids, email):
         raise AssertionError("fetched with no PMIDs")
 
-    monkeypatch.setattr(vcf_pubmed, "search_pubmed", lambda t, r, e: SearchResult(0, [], "x"))
+    monkeypatch.setattr(
+        vcf_pubmed, "search_pubmed", lambda t, r, e: SearchResult(0, [], "x")
+    )
     monkeypatch.setattr(vcf_pubmed, "fetch_articles_xml", fetch)
     hit = load_or_fetch_hits([RS], tmp_path / "h.json", email=EMAIL)[0]
     assert (hit.count, hit.articles) == (0, ())
@@ -161,7 +180,9 @@ def test_refresh_failure_keeps_cache(tmp_path, monkeypatch):
     assert cache.read_bytes() == before
 
 
-@pytest.mark.parametrize("reply", ["<PubmedArticleSet/>", "<html><body>502 Bad Gateway</body></html>"])
+@pytest.mark.parametrize(
+    "reply", ["<PubmedArticleSet/>", "<html><body>502 Bad Gateway</body></html>"]
+)
 def test_refresh_with_wellformed_empty_reply_keeps_cache(tmp_path, monkeypatch, reply):
     cache = tmp_path / "hits.json"
     _stub_network(monkeypatch)

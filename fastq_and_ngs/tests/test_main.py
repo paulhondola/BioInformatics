@@ -1,11 +1,11 @@
-from pathlib import Path
 import zipfile
+from pathlib import Path
 
 import pytest
 
 from fastq_and_ngs import __main__ as cli
-from fastq_and_ngs.pubmed_query import Article
 from fastq_and_ngs.__main__ import build_submission_zip, copy_fasta, main, run_tasks
+from fastq_and_ngs.pubmed_query import Article
 
 EMAIL = "test@example.org"
 OUTPUTS = (
@@ -23,8 +23,12 @@ def project(tmp_path, monkeypatch):
     """A fake project: real parsers, no network and no real FASTQ."""
     (tmp_path / "data").mkdir()
     (tmp_path / "data/human_tp53.fa").write_text(">NM_000546.6\nACGT\n")
-    (tmp_path / "data/tp53_variants.vcf").write_text("17\t1\trs1\tA\tT\n17\t2\t.\tA\tT\n")
-    monkeypatch.setattr(cli, "load_or_fetch_articles", lambda *a, **k: [Article("1", "T", (), None)])
+    (tmp_path / "data/tp53_variants.vcf").write_text(
+        "17\t1\trs1\tA\tT\n17\t2\t.\tA\tT\n"
+    )
+    monkeypatch.setattr(
+        cli, "load_or_fetch_articles", lambda *a, **k: [Article("1", "T", (), None)]
+    )
     monkeypatch.setattr(cli, "load_or_fetch_hits", lambda *a, **k: [])
     return tmp_path
 
@@ -37,12 +41,24 @@ def _existing_report(root: Path) -> Path:
 
 
 def _complete_project(root: Path) -> None:
-    for name in ("README.txt", "notes.pdf", "pyproject.toml", ".python-version", "uv.lock"):
+    for name in (
+        "README.txt",
+        "notes.pdf",
+        "pyproject.toml",
+        ".python-version",
+        "uv.lock",
+    ):
         (root / name).write_text("x")
     (root / "results").mkdir(exist_ok=True)
     for name in OUTPUTS:
         (root / "results" / name).write_text("x")
-    for rel in ("src/fastq_and_ngs/a.py", "tests/test_a.py", FASTQ, "src/fastq_and_ngs/__pycache__/a.pyc", "data/.DS_Store"):
+    for rel in (
+        "src/fastq_and_ngs/a.py",
+        "tests/test_a.py",
+        FASTQ,
+        "src/fastq_and_ngs/__pycache__/a.pyc",
+        "data/.DS_Store",
+    ):
         path = root / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("x")
@@ -60,7 +76,11 @@ def test_task_all_without_fastq_warns_and_runs_others(project, capsys):
     assert run_tasks(project, "all", False, EMAIL) == 0
     assert "SRR31709504" in capsys.readouterr().err
     assert report.read_text() == "real report"
-    for name in ("pubmed_paulhondola.txt", "fasta_paulhondola.fasta", "variants_paulhondola.txt"):
+    for name in (
+        "pubmed_paulhondola.txt",
+        "fasta_paulhondola.fasta",
+        "variants_paulhondola.txt",
+    ):
         assert (project / "results" / name).exists()
 
 
@@ -84,7 +104,9 @@ def test_corrupt_fastq_returns_error_and_keeps_report(project, capsys):
 
 def test_single_task_runs_only_that_task(project):
     assert run_tasks(project, "2", False, EMAIL) == 0
-    assert [p.name for p in (project / "results").iterdir()] == ["fasta_paulhondola.fasta"]
+    assert [p.name for p in (project / "results").iterdir()] == [
+        "fasta_paulhondola.fasta"
+    ]
 
 
 def test_refresh_failure_returns_error_without_traceback(project, monkeypatch, capsys):
@@ -106,11 +128,21 @@ def test_zip_layout_and_exclusions(project, tmp_path):
     _complete_project(project)
     out = project / "fastq_and_ngs_paulhondola.zip"
     names = zipfile.ZipFile(build_submission_zip(project, out)).namelist()
-    for needed in ("README.txt", "notes.pdf", "uv.lock", "data/human_tp53.fa", "src/fastq_and_ngs/a.py", "tests/test_a.py"):
+    for needed in (
+        "README.txt",
+        "notes.pdf",
+        "uv.lock",
+        "data/human_tp53.fa",
+        "src/fastq_and_ngs/a.py",
+        "tests/test_a.py",
+    ):
         assert needed in names
     assert {f"results/{name}" for name in OUTPUTS} <= set(names)
     assert not any(
-        n.startswith("data/work/") or "__pycache__" in n or n.endswith((".DS_Store", ".zip")) for n in names
+        n.startswith("data/work/")
+        or "__pycache__" in n
+        or n.endswith((".DS_Store", ".zip"))
+        for n in names
     )
 
 

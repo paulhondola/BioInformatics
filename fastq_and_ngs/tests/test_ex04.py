@@ -11,7 +11,10 @@ from fastq_and_ngs.ex04_fastq_stats import (
     write_qc_plot,
 )
 
-REAL_FASTQ = Path(__file__).resolve().parents[1] / "data/work/paulhondola/lab03/your_reads.fastq.gz"
+REAL_FASTQ = (
+    Path(__file__).resolve().parents[1]
+    / "data/work/paulhondola/lab03/your_reads.fastq.gz"
+)
 REAL_REPORT = "Reads: 81220\nMean length: 142.00\nN rate: 0.0000\nMean Phred: 37.30\n"
 TWO_READS = "@r1\nACGN\n+\nIIII\n@r2\nAC\n+\n++\n"
 
