@@ -1,0 +1,41 @@
+VCF to PubMed | Variants: 5
+
+Variant: 17:7676154 G>C (ID: rs1042522)
+Query: rs1042522
+PubMed read it as: "rs1042522"[All Fields]
+Hits: 351
+  PMID 42938823: Combined TP53 Codon 72 Genotype and p53 Expression in Association with Vitamin D Benefit in Digestive Tract Cancer: A Post-Hoc Study of the AMATERASU Trial.
+  PMID 42832476: Impact of GST and TP53 gene polymorphisms on susceptibility to end stage renal disease: A case-control analysis.
+  PMID 42246034: Toward the genetic landscape of prostate cancer in India: insights from whole-exome and low-pass whole-genome sequencing of formalin-fixed paraffin-embedded tumor tissues.
+
+Variant: 17:7675088 C>T (ID: rs28934578)
+Query: rs28934578
+PubMed read it as: "rs28934578"[All Fields]
+Hits: 1
+  PMID 24929325: Germline mutations of TP53 gene in breast cancer.
+
+Variant: 17:7674220 C>T (ID: rs11540652)
+Query: rs11540652
+PubMed read it as: "rs11540652"[All Fields]
+Hits: 3
+  PMID 38867324: Mutations in Helicobacter pylori infected patients with chronic gastritis, intestinal type of gastric cancer and familial gastric cancer.
+  PMID 32867815: A deep analysis using panel-based next-generation sequencing in an Ecuadorian pediatric patient with anaplastic astrocytoma: a case report.
+  PMID 30744407: Single nucleotide recognition using a probes-on-carrier DNA chip.
+
+Variant: 17:7675091 C>G (ID: none)
+Query: chr17:7675091 AND TP53
+PubMed read it as: "chr17"[All Fields] AND ("tp53 protein human"[Supplementary Concept] OR "tp53 protein human"[All Fields] OR "tp53"[All Fields])
+Hits: 13
+WARNING: PubMed dropped the position from this query; hits are about chr17 and TP53, not this variant.
+  PMID 42661989: Clinicopathological Analysis of Orthokeratinized Odontogenic Cyst Aided by a Pilot Molecular Characterization Using Next-Generation Sequencing.
+  PMID 41648238: Chromosome 3p deletion leads to extensive genomic alterations in diverse cancers and confers synthetic lethality in uveal melanoma.
+  PMID 38048050: Aneuploidy Landscape in Precursors of Ovarian Cancer.
+
+Variant: 17:7674224 T>G (ID: none)
+Query: chr17:7674224 AND TP53
+PubMed read it as: "chr17"[All Fields] AND ("tp53 protein human"[Supplementary Concept] OR "tp53 protein human"[All Fields] OR "tp53"[All Fields])
+Hits: 13
+WARNING: PubMed dropped the position from this query; hits are about chr17 and TP53, not this variant.
+  PMID 42661989: Clinicopathological Analysis of Orthokeratinized Odontogenic Cyst Aided by a Pilot Molecular Characterization Using Next-Generation Sequencing.
+  PMID 41648238: Chromosome 3p deletion leads to extensive genomic alterations in diverse cancers and confers synthetic lethality in uveal melanoma.
+  PMID 38048050: Aneuploidy Landscape in Precursors of Ovarian Cancer.

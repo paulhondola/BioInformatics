@@ -1,0 +1,11 @@
+##fileformat=VCFv4.2
+##source=ClinVar (accessed 2026-11-04)
+##reference=GRCh38
+##INFO=<ID=CLNID,Number=1,Type=String,Description="ClinVar variation record (UID in the ClinVar E-utilities database)">
+##INFO=<ID=CLNHGVS,Number=1,Type=String,Description="HGVS on NM_000546.6; REF and ALT are forward-strand, from the ClinVar SPDI">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+17	7676154	rs1042522	G	C	.	.	CLNID=12351;CLNHGVS=NM_000546.6:c.215C>G
+17	7675088	rs28934578	C	T	.	.	CLNID=12374;CLNHGVS=NM_000546.6:c.524G>A
+17	7674220	rs11540652	C	T	.	.	CLNID=12356;CLNHGVS=NM_000546.6:c.743G>A
+17	7675091	.	C	G	.	.	CLNID=5031076;CLNHGVS=NM_000546.6:c.521G>C
+17	7674224	.	T	G	.	.	CLNID=5031067;CLNHGVS=NM_000546.6:c.739A>C
