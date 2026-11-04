@@ -1,0 +1,29 @@
+[project]
+name = "sequence-alignment"
+version = "0.1.0"
+description = "Sequence alignment assignment (Lab 02) on orthologous vertebrate TP53 mRNAs"
+readme = "README.txt"
+authors = [
+    { name = "Paul Hondola", email = "paulhondola@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "biopython>=1.84",
+    "polars>=1.0",
+    "requests>=2.31",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[project.scripts]
+sequence-alignment = "sequence_alignment.__main__:main"
+
+[tool.uv.build-backend]
+module-name = "sequence_alignment"
+
+[build-system]
+requires = ["uv_build>=0.13.6,<0.14.0"]
+build-backend = "uv_build"

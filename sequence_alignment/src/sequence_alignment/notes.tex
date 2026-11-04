@@ -1,0 +1,75 @@
+\pdfobjcompresslevel=0
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage[margin=1.35cm,top=1.15cm,bottom=1.15cm]{geometry}
+\usepackage{booktabs}
+\usepackage{fancyvrb}
+
+\providecommand{\rocomma}[1]{{\ooalign{\null#1\crcr\hidewidth\raise-.31ex\hbox{\scriptsize,}\hidewidth}}}
+\DeclareUnicodeCharacter{0218}{\rocomma{S}}
+\DeclareUnicodeCharacter{0219}{\rocomma{s}}
+\DeclareUnicodeCharacter{021A}{\rocomma{T}}
+\DeclareUnicodeCharacter{021B}{\rocomma{t}}
+\DeclareUnicodeCharacter{2032}{'}
+\DeclareUnicodeCharacter{2013}{--}
+\DeclareUnicodeCharacter{2014}{---}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+
+\newcommand{\taskheading}[1]{\vspace{4pt}{\normalsize\bfseries #1}\par\vspace{1pt}}
+
+\begin{document}
+\small
+
+{\large\bfseries Săptămâna 2 — Sequence Alignment (\texttt{TP53} RefSeq mRNA) \hfill Paul Hondola}\par\vspace{2pt}
+{\footnotesize\textbf{Secvențe proprii (Lab 1, NCBI RefSeq):} \texttt{NM\_000546.6} (\emph{Homo sapiens}, 2512 nt), \texttt{NM\_011640.3} (\emph{Mus musculus}, 1781 nt), \texttt{NM\_131327.2} (\emph{Danio rerio}, 2233 nt).}\par
+\vspace{2pt}\hrule\vspace{3pt}
+
+\taskheading{Task 1 — Distanțe perechi (\textit{p-distance}, 3p)}
+Lungimile diferă ($1781$--$2512$ nt), deci Hamming nu se aplică; s-a calculat \textbf{p-distance} pe aliniamente globale (\texttt{PairwiseAligner}, $+1/{-1}/{-2}$; nu \texttt{globalxx}, ale cărui gap-uri gratuite ocolesc nepotrivirile), fără coloanele cu gap. Biopython alege unul dintre multele aliniamente co-optime, deci toate numărătorile din pagină depind de această alegere (ordinea argumentelor e fixată).
+
+\begin{center}
+\footnotesize
+\begin{tabular}{lccc}
+\toprule
+\textbf{Accesie (Organism)} & \textbf{NM\_000546.6} & \textbf{NM\_011640.3} & \textbf{NM\_131327.2} \\
+\midrule
+\texttt{NM\_000546.6} (\emph{Homo sapiens}, 2512 nt) & \texttt{0.0000} & \textbf{\texttt{0.1641}} ($287/1749$) & \texttt{0.3809} ($836/2195$) \\
+\texttt{NM\_011640.3} (\emph{Mus musculus}, 1781 nt) & --- & \texttt{0.0000} & \texttt{0.3692} ($648/1755$) \\
+\texttt{NM\_131327.2} (\emph{Danio rerio}, 2233 nt) & --- & --- & \texttt{0.0000} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Interpretare:} Cele mai apropiate sunt omul și șoarecele ($p = 0.1641$, de peste două ori sub $\approx 0.37$--$0.38$ față de peștele zebră), ambele mamifere placentare (divergență $\approx 90$ mil.\ ani, față de $\approx 430$ mil.\ ani pentru teleosteeni). Semnalul fiabil vine din regiunea codantă ($p = 0.171$); $p = 0.078$ pe 3$'$-UTR e un artefact (737 coloane cu gap eliminate; local: $0.318$), iar 5$'$-UTR are $0.388$.
+
+\taskheading{Task 2 — Aliniere pe perechi: Global vs.\ Local (\texttt{NM\_000546.6} vs.\ \texttt{NM\_011640.3}, 4p)}
+Cu scor afin ($+2/{-1}$, gap $-2/{-1}$), alinierea \textbf{locală} atinge scorul \textbf{2014.0} (față de \textbf{1664.0} la globală), izolând regiunea omoloagă (\texttt{0..1790} pe om vs.\ \texttt{22..1775} pe șoarece; $1326$ potriviri) și ignorând $\approx 720$ nt din 3$'$-UTR-ul uman; are $193$ baze de gap în $96$ deschideri ($42$ în 5$'$-UTR, $32$ în CDS, $119$ în 3$'$-UTR). Constrânsă să alinieze transcripturile cap-coadă (\texttt{0..2512} vs.\ \texttt{16..1781}), alinierea \textbf{globală} acumulează \textbf{839 baze de gap} ($168$ deschideri; $64$/$32$/$\mathbf{743}$ pe aceleași regiuni; $16$ terminale, $823$ interne), pierzând $350$ puncte. Pentru a acoperi diferența de lungime din 3$'$-UTR, global deplasează segmentul murin \texttt{1599--1621} cu $\approx 380$ nt în aval (\texttt{2004--2059}) și îl fragmentează cu 33 baze de gap, pe când local îl păstrează compact (\texttt{1599--1651} vs.\ \texttt{1625--1673}):
+\begin{Verbatim}[fontsize=\scriptsize,frame=single,framesep=2.5pt]
+[GLOBAL] NM_000546.6 2004 AGGATTTCATCTCTTGTATATGATGATCTGGATCCACCAAGACTTGTTTTATGCTC 2059
+                          |.|| ||| |.|||||             ||     ||    |     |.||
+         NM_011640.3 1599 AAGA-TTC-TATCTTG-------------GG-----CC----C-----TCAT---- 1621
+[LOCAL]  NM_000546.6 1625 -ACATTCTAGGTAGGGGCCCACTTCACCGTAC-TA---ACCAGGG--AAGCTGTCC 1673
+                           |.||||||..| .||||||.|.| |..||.| ||   .||||||  .| ||.|||
+         NM_011640.3 1599 AAGATTCTATCT-TGGGCCCTCAT-AGGGTCCATATCCTCCAGGGCCTA-CTTTCC 1651
+\end{Verbatim}
+
+\taskheading{Task 3 — Aliniere multiplă online (EBI MSA, 3p)}
+MSA online EMBL-EBI (instrument echivalent: MUSCLE 3.8, format Clustal; \texttt{data/clustalo\_msa.aln}): $2801$ coloane, $799$ invariante (\texttt{*}, $28.53\%$). Regiunea marcată, coloanele \texttt{923..967}:
+\begin{Verbatim}[fontsize=\scriptsize,frame=single,framesep=2.5pt]
+NM_000546.6  CTGCATGGGCGGCATGAACCGGAGGCCCATCCTCACCATCATCAC  865-909
+NM_011640.3  CTGCATGGGGGGCATGAACCGCCGACCTATCCTTACCATCATCAC  871-915
+NM_131327.2  CTGCATGGGGGGGATGAACCGCAGGCCCATCCTCACAATCATCAC  798-842
+             ********* ** ********  * ** ***** ** ********
+\end{Verbatim}
+\textbf{Motiv conservat și rolul MSA:} Fereastra ($82.2\%$ identitate, cu motivul contiguu de 9 nt \texttt{CTGCATGGG}) codifică \texttt{Cys242--Thr256} (\texttt{CMGGMNRRPILTIIT}), identice la toate speciile, de la bucla L3 (rez.\ $\approx 237$--$250$) a domeniului de legare la ADN. Selecția purificatoare se explică prin rolul lor: \texttt{Cys242} coordonează $\text{Zn}^{2+}$, \texttt{Arg248} contactează șanțul minor, iar \texttt{Gly245}/\texttt{Arg249} stabilizează structural bucla. Cele 8 substituții sunt sinonime (7 la baza a 3-a; \texttt{Arg249}: \texttt{AGG}$\to$\texttt{CGA} schimbă și baza 1). MSA ajută când comparăm o familie: toate speciile stau în aceleași coloane, deci situsurile constrânse se văd direct, ceea ce perechile independente nu garantează.
+
+\taskheading{Bonus — Aliniere semiglobală (+1p)}
+\texttt{PairwiseAligner(mode="global", end\_gap\_score=0)} urcă scorul de la $1664.0$ la \textbf{2014.0}, egal cu cel local. Alinierea (om \texttt{0..1980}, șoarece \texttt{22..1781}) are $554$ baze în gap-uri terminale ($532$ om 3$'$, $22$ șoarece 5$'$), dar una co-optimă se oprește la \texttt{1790/1775} ($750$ terminale). Prefer semiglobal când aliniez cap-coadă o secvență scurtă (CDS, exon, primer, read NGS) pe o referință mai lungă, fără a trunchia capetele (ca local) și fără a penaliza flancurile (ca global), sau la suprapuneri între contig-uri.
+
+\end{document}
