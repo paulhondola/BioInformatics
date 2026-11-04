@@ -1,8 +1,10 @@
 from io import StringIO
 from pathlib import Path
 from unittest.mock import MagicMock, patch
+
 import pytest
 from Bio import AlignIO
+
 from sequence_alignment.sequences import SequenceRecord, load_sequences
 from sequence_alignment.task3_msa import (
     EBI_MUSCLE_BASE,
@@ -25,9 +27,15 @@ TOY_CLUSTAL = (
 
 def _toy_records() -> list[SequenceRecord]:
     return [
-        SequenceRecord("NM_000546.6", "Homo sapiens", "", "TTTACGTACGTACGTGGG", 18, Path("a")),
-        SequenceRecord("NM_011640.3", "Mus musculus", "", "CCCACGTACGTACGTAAA", 18, Path("b")),
-        SequenceRecord("NM_131327.2", "Danio rerio", "", "GGGACGTACGTACGTTTT", 18, Path("c")),
+        SequenceRecord(
+            "NM_000546.6", "Homo sapiens", "", "TTTACGTACGTACGTGGG", 18, Path("a")
+        ),
+        SequenceRecord(
+            "NM_011640.3", "Mus musculus", "", "CCCACGTACGTACGTAAA", 18, Path("b")
+        ),
+        SequenceRecord(
+            "NM_131327.2", "Danio rerio", "", "GGGACGTACGTACGTTTT", 18, Path("c")
+        ),
     ]
 
 
@@ -36,19 +44,26 @@ def test_fetch_clustalo_msa_polls_until_finished_and_handles_failure():
     running_resp = MagicMock(status_code=200, text="RUNNING")
     done_resp = MagicMock(status_code=200, text="FINISHED")
     aln_resp = MagicMock(status_code=200, text=TOY_CLUSTAL)
-    with patch("sequence_alignment.task3_msa.requests.post", return_value=post_resp) as m_post, patch(
-        "sequence_alignment.task3_msa.requests.get", side_effect=[running_resp, done_resp, aln_resp]
+    with (
+        patch(
+            "sequence_alignment.task3_msa.requests.post", return_value=post_resp
+        ) as m_post,
+        patch(
+            "sequence_alignment.task3_msa.requests.get",
+            side_effect=[running_resp, done_resp, aln_resp],
+        ),
     ):
         text = fetch_clustalo_msa(_toy_records(), poll_interval_s=0.01, timeout_s=5.0)
         assert "CLUSTAL" in text
         assert m_post.call_args.kwargs["data"]["stype"] == "dna"
 
     err_resp = MagicMock(status_code=200, text="FAILURE")
-    with patch("sequence_alignment.task3_msa.requests.post", return_value=post_resp), patch(
-        "sequence_alignment.task3_msa.requests.get", return_value=err_resp
+    with (
+        patch("sequence_alignment.task3_msa.requests.post", return_value=post_resp),
+        patch("sequence_alignment.task3_msa.requests.get", return_value=err_resp),
+        pytest.raises(RuntimeError, match="FAILURE"),
     ):
-        with pytest.raises(RuntimeError, match="FAILURE"):
-            fetch_clustalo_msa(_toy_records(), poll_interval_s=0.01, timeout_s=1.0)
+        fetch_clustalo_msa(_toy_records(), poll_interval_s=0.01, timeout_s=1.0)
 
 
 def test_cache_used_offline_and_mismatched_ids_rejected(tmp_path: Path):
@@ -58,7 +73,9 @@ def test_cache_used_offline_and_mismatched_ids_rejected(tmp_path: Path):
         msa = load_or_fetch_msa(_toy_records(), cache, refresh=False)
         m_post.assert_not_called()
         assert len(msa) == 3
-    bad_recs = _toy_records()[:2] + [SequenceRecord("OTHER", "Org", "", "ACGT", 4, Path("d"))]
+    bad_recs = _toy_records()[:2] + [
+        SequenceRecord("OTHER", "Org", "", "ACGT", 4, Path("d"))
+    ]
     with pytest.raises(ValueError, match="do not match"):
         load_or_fetch_msa(bad_recs, cache, refresh=False)
 
@@ -68,9 +85,13 @@ def test_refresh_keeps_cache_when_response_is_invalid(tmp_path: Path):
     cache.write_text(TOY_CLUSTAL)
     wrong_seq = TOY_CLUSTAL.replace("TTTACGTACGTACGTGGG", "AAAACGTACGTACGTGGG")
     for bad_text in ("<html>service error</html>", wrong_seq):
-        with patch("sequence_alignment.task3_msa.fetch_clustalo_msa", return_value=bad_text):
-            with pytest.raises(ValueError):
-                load_or_fetch_msa(_toy_records(), cache, refresh=True)
+        with (
+            patch(
+                "sequence_alignment.task3_msa.fetch_clustalo_msa", return_value=bad_text
+            ),
+            pytest.raises(ValueError),
+        ):
+            load_or_fetch_msa(_toy_records(), cache, refresh=True)
         assert cache.read_text() == TOY_CLUSTAL
 
 
@@ -95,9 +116,14 @@ def test_fetch_clustalo_msa_falls_back_to_ebi_muscle_on_queued_stall():
     queued_resp = MagicMock(status_code=200, text="QUEUED")
     done_resp = MagicMock(status_code=200, text="FINISHED")
     aln_resp = MagicMock(status_code=200, text=TOY_CLUSTAL)
-    with patch("sequence_alignment.task3_msa.requests.post", side_effect=[co_post, mu_post]) as m_post, patch(
-        "sequence_alignment.task3_msa.requests.get",
-        side_effect=[queued_resp, queued_resp, done_resp, aln_resp],
+    with (
+        patch(
+            "sequence_alignment.task3_msa.requests.post", side_effect=[co_post, mu_post]
+        ) as m_post,
+        patch(
+            "sequence_alignment.task3_msa.requests.get",
+            side_effect=[queued_resp, queued_resp, done_resp, aln_resp],
+        ),
     ):
         text = fetch_clustalo_msa(
             _toy_records(),
@@ -123,6 +149,7 @@ import re
 import subprocess
 import sys
 import zipfile
+
 from sequence_alignment.__main__ import build_submission_zip, main
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -143,12 +170,20 @@ def test_cli_runs_and_deliverables_meet_moodle_constraints(tmp_path: Path, capsy
     with pytest.raises(FileNotFoundError):
         build_submission_zip(tmp_path, tmp_path / "missing.zip")
 
-    zip_path = build_submission_zip(REPO_ROOT, tmp_path / "sequence_alignment_paulhondola.zip")
+    zip_path = build_submission_zip(
+        REPO_ROOT, tmp_path / "sequence_alignment_paulhondola.zip"
+    )
     with zipfile.ZipFile(zip_path) as zf:
         names = set(zf.namelist())
-        assert {"README.txt", "notes.pdf", "pyproject.toml", "data/clustalo_msa.aln"} <= names
+        assert {
+            "README.txt",
+            "notes.pdf",
+            "pyproject.toml",
+            "data/clustalo_msa.aln",
+        } <= names
         assert not any(
-            "__pycache__" in n or n.startswith("docs/") or ".DS_Store" in n for n in names
+            "__pycache__" in n or n.startswith("docs/") or ".DS_Store" in n
+            for n in names
         )
         extract_dir = tmp_path / "unzipped"
         zf.extractall(extract_dir)

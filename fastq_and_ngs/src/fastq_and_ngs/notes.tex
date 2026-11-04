@@ -1,0 +1,52 @@
+\pdfobjcompresslevel=0
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=2cm]{geometry}
+\usepackage{booktabs}
+
+\providecommand{\rocomma}[1]{{\ooalign{\null#1\crcr\hidewidth\raise-.31ex\hbox{\scriptsize,}\hidewidth}}}
+\DeclareUnicodeCharacter{0218}{\rocomma{S}}
+\DeclareUnicodeCharacter{0219}{\rocomma{s}}
+\DeclareUnicodeCharacter{021A}{\rocomma{T}}
+\DeclareUnicodeCharacter{021B}{\rocomma{t}}
+\DeclareUnicodeCharacter{2013}{--}
+\DeclareUnicodeCharacter{2014}{---}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+
+\newcommand{\taskheading}[1]{\vspace{6pt}{\normalsize\bfseries #1}\par\vspace{1pt}}
+
+\begin{document}
+
+{\large\bfseries Săptămâna 3 — Formate și NGS (\texttt{TP53}) \hfill Paul Hondola}\par\vspace{2pt}
+{\footnotesize\textbf{FASTQ propriu:} \texttt{SRR31709504} (citirea 1 din pereche; studiul \texttt{PRJNA1198040}, ADNc \emph{TP53}, Illumina MiSeq, amplicon).}\par
+\vspace{2pt}\hrule\vspace{3pt}
+
+\taskheading{De ce este important QC înainte de variant calling?}
+Algoritmii de variant calling folosesc scorurile Phred pentru a separa variația reală de zgomot, așa că erorile de secvențiere necontrolate pot apărea ca variante false-pozitive. QC scoate la iveală și artefacte tehnice, precum scăderea calității la capetele citirilor, adaptorii rămași sau bazele nedeterminate, care altfel produc alinieri greșite. Pe fișierul meu am obținut 81220 citiri, lungime medie 142.00 bp, proporție de N 0.0000 și scor Phred mediu 37.30, deci datele sunt de bună calitate per ansamblu. Lungimea identică a tuturor citirilor este compatibilă cu un experiment de tip amplicon, iar graficul arată totuși o coadă de citiri cu scor mediu mai mic, pe care o medie globală singură ar ascunde-o.
+
+\taskheading{Cum am formulat căutările PubMed pentru variante}
+Am folosit un VCF propriu cu cinci variante \emph{TP53} reale din ClinVar (GRCh38): pentru cele cu ID am căutat direct rsID-ul, iar pentru cele fără ID am folosit forma din cerință, \texttt{chr<CHROM>:<POS> AND TP53}. Am salvat și \texttt{QueryTranslation}, adică felul în care PubMed a interpretat fiecare căutare, și astfel am observat că PubMed elimină poziția: ambele variante fără ID dau aceleași 13 articole, care privesc \texttt{chr17} și \emph{TP53}, nu varianta respectivă. De aceea raportul marchează explicit aceste rezultate, iar rezultatele căutărilor după rsID sunt singurele specifice variantei.
+
+\begin{center}
+\footnotesize
+\begin{tabular}{lll r}
+\toprule
+\textbf{Poziție (GRCh38)} & \textbf{Modificare} & \textbf{Căutare} & \textbf{Articole} \\
+\midrule
+\texttt{17:7676154} & \texttt{G>C} & \texttt{rs1042522} & 351 \\
+\texttt{17:7675088} & \texttt{C>T} & \texttt{rs28934578} & 1 \\
+\texttt{17:7674220} & \texttt{C>T} & \texttt{rs11540652} & 3 \\
+\texttt{17:7675091} & \texttt{C>G} & \texttt{chr17:7675091 AND TP53} & 13 (nespecific) \\
+\texttt{17:7674224} & \texttt{T>G} & \texttt{chr17:7674224 AND TP53} & 13 (nespecific) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+{\footnotesize Numărul de articole este cel de la data interogării (4 noiembrie 2026) și se poate schimba în timp.}
+
+\end{document}

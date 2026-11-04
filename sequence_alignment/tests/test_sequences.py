@@ -1,6 +1,8 @@
 from pathlib import Path
+
 import pytest
 from Bio.Seq import Seq
+
 from sequence_alignment.sequences import CDS_SPANS, get_record, load_sequences
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
@@ -8,9 +10,17 @@ DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 
 def test_human_cds_span_translates_to_full_length_p53():
     start, end = CDS_SPANS["NM_000546.6"]
-    protein = str(Seq(get_record(load_sequences(DATA_DIR), "NM_000546.6").seq[start:end]).translate())
-    assert protein.startswith("MEEPQSDP") and protein.endswith("*") and len(protein) == 394
-    assert protein[241:256] == "CMGGMNRRPILTIIT"  # residues Cys242..Thr256 cited in notes.tex
+    protein = str(
+        Seq(
+            get_record(load_sequences(DATA_DIR), "NM_000546.6").seq[start:end]
+        ).translate()
+    )
+    assert (
+        protein.startswith("MEEPQSDP") and protein.endswith("*") and len(protein) == 394
+    )
+    assert (
+        protein[241:256] == "CMGGMNRRPILTIIT"
+    )  # residues Cys242..Thr256 cited in notes.tex
 
 
 def test_load_tp53_sequences_canonical_order_and_lengths():

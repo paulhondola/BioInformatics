@@ -1,0 +1,28 @@
+[project]
+name = "fastq-and-ngs"
+version = "0.1.0"
+description = "Formats and NGS assignment (Lab 03): PubMed parsing, FASTQ QC and VCF to PubMed on TP53"
+readme = "README.txt"
+authors = [
+    { name = "Paul Hondola", email = "paulhondola@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "biopython>=1.84",
+    "matplotlib>=3.9",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[project.scripts]
+fastq-and-ngs = "fastq_and_ngs.__main__:main"
+
+[tool.uv.build-backend]
+module-name = "fastq_and_ngs"
+
+[build-system]
+requires = ["uv_build>=0.13.6,<0.14.0"]
+build-backend = "uv_build"

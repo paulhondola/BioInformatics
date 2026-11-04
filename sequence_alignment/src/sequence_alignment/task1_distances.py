@@ -5,8 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from itertools import combinations
 
-from Bio import Align
 import polars as pl
+from Bio import Align
 
 from sequence_alignment.sequences import CDS_SPANS, SequenceRecord
 from sequence_alignment.task2_pairwise import format_regions, region_stats
@@ -137,18 +137,24 @@ def compute_distances(records: list[SequenceRecord]) -> DistanceSummary:
                 "global_score": p.score,
                 "mismatches": p.mismatches,
                 "compared_sites": p.compared_sites,
-                "p_distance": f"{p.p_distance:.4f}" if p.p_distance is not None else "NA",
+                "p_distance": f"{p.p_distance:.4f}"
+                if p.p_distance is not None
+                else "NA",
             }
             for p in pairs
         ]
     )
 
     valid_pairs = [p for p in pairs if p.p_distance is not None]
-    closest_pair = min(valid_pairs, key=lambda p: p.p_distance) if valid_pairs else pairs[0]
+    closest_pair = (
+        min(valid_pairs, key=lambda p: p.p_distance) if valid_pairs else pairs[0]
+    )
     seqs = {r.accession: r.seq for r in records}
     cds = CDS_SPANS.get(closest_pair.id1)
     closest_regions = (
-        region_stats(_global_alignment(seqs[closest_pair.id1], seqs[closest_pair.id2]), cds)
+        region_stats(
+            _global_alignment(seqs[closest_pair.id1], seqs[closest_pair.id2]), cds
+        )
         if cds
         else {}
     )
@@ -176,6 +182,10 @@ def format_task1_report(summary: DistanceSummary) -> str:
             "Pairwise alignment details:",
             tbl_str,
             f"Closest pair: {cp.id1} vs {cp.id2} (p-distance = {cp_val}, {cp.mismatches}/{cp.compared_sites} mismatches)",
-            *([f"By {cp.id1} region: {format_regions(summary.closest_regions)}"] if summary.closest_regions else []),
+            *(
+                [f"By {cp.id1} region: {format_regions(summary.closest_regions)}"]
+                if summary.closest_regions
+                else []
+            ),
         ]
     )

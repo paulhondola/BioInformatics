@@ -3,17 +3,21 @@
 from __future__ import annotations
 
 import argparse
-from pathlib import Path
 import shutil
 import subprocess
 import tempfile
 import zipfile
+from pathlib import Path
 
 from sequence_alignment.bonus_semiglobal import compare_semiglobal, format_bonus_report
 from sequence_alignment.sequences import get_record, load_sequences
 from sequence_alignment.task1_distances import compute_distances, format_task1_report
 from sequence_alignment.task2_pairwise import compare_global_local, format_task2_report
-from sequence_alignment.task3_msa import analyze_msa, format_task3_report, load_or_fetch_msa
+from sequence_alignment.task3_msa import (
+    analyze_msa,
+    format_task3_report,
+    load_or_fetch_msa,
+)
 
 
 def _default_repo_root() -> Path:
@@ -27,7 +31,9 @@ def _find_pdflatex() -> str:
     mac_tex = Path("/Library/TeX/texbin/pdflatex")
     if mac_tex.is_file():
         return str(mac_tex)
-    raise RuntimeError("pdflatex executable not found on PATH or /Library/TeX/texbin/pdflatex")
+    raise RuntimeError(
+        "pdflatex executable not found on PATH or /Library/TeX/texbin/pdflatex"
+    )
 
 
 def compile_notes_pdf(tex_path: Path, output_pdf: Path) -> Path:
@@ -91,7 +97,11 @@ def build_submission_zip(repo_root: Path, output_zip: Path) -> Path:
                 if item.is_dir():
                     continue
                 parts = set(item.parts)
-                if "__pycache__" in parts or item.name == ".DS_Store" or item.suffix in {".pyc", ".pyo"}:
+                if (
+                    "__pycache__" in parts
+                    or item.name == ".DS_Store"
+                    or item.suffix in {".pyc", ".pyo"}
+                ):
                     continue
                 zf.write(item, arcname=item.relative_to(root).as_posix())
     return zip_dest
@@ -100,7 +110,9 @@ def build_submission_zip(repo_root: Path, output_zip: Path) -> Path:
 def main(argv: list[str] | None = None) -> int:
     """Run Lab 02 sequence alignment pipeline and optional PDF/ZIP builders."""
     repo_root = _default_repo_root()
-    parser = argparse.ArgumentParser(description="Lab 02 Sequence Alignment Pipeline (Paul Hondola)")
+    parser = argparse.ArgumentParser(
+        description="Lab 02 Sequence Alignment Pipeline (Paul Hondola)"
+    )
     parser.add_argument(
         "--data-dir",
         type=Path,
@@ -135,7 +147,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
     if args.refresh_msa and (args.pdf or args.zip):
-        parser.error("--refresh-msa changes the MSA that notes.tex hard-codes; update the notes before --pdf/--zip")
+        parser.error(
+            "--refresh-msa changes the MSA that notes.tex hard-codes; update the notes before --pdf/--zip"
+        )
 
     records = load_sequences(args.data_dir)
     hs = get_record(records, "NM_000546.6")
@@ -143,7 +157,10 @@ def main(argv: list[str] | None = None) -> int:
 
     sections: list[str] = [
         "Loaded Lab 1 TP53 RefSeq transcripts:\n"
-        + "\n".join(f"  - {r.accession} ({r.organism}, {r.length} nt) [{r.path.name}]" for r in records)
+        + "\n".join(
+            f"  - {r.accession} ({r.organism}, {r.length} nt) [{r.path.name}]"
+            for r in records
+        )
     ]
 
     if args.task in {"all", "1"}:
@@ -154,7 +171,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.task in {"all", "3"}:
         msa_cache = Path(args.data_dir) / "clustalo_msa.aln"
-        msa = load_or_fetch_msa(records, msa_cache, refresh=args.refresh_msa, email=args.email)
+        msa = load_or_fetch_msa(
+            records, msa_cache, refresh=args.refresh_msa, email=args.email
+        )
         sections.append(format_task3_report(analyze_msa(msa)))
 
     if args.task in {"all", "bonus"}:
@@ -163,11 +182,15 @@ def main(argv: list[str] | None = None) -> int:
     print("\n\n".join(sections))
 
     if args.pdf:
-        pdf_out = compile_notes_pdf(Path(__file__).resolve().parent / "notes.tex", repo_root / "notes.pdf")
+        pdf_out = compile_notes_pdf(
+            Path(__file__).resolve().parent / "notes.tex", repo_root / "notes.pdf"
+        )
         print(f"\nCompiled report: {pdf_out}")
 
     if args.zip:
-        zip_out = build_submission_zip(repo_root, repo_root / "sequence_alignment_paulhondola.zip")
+        zip_out = build_submission_zip(
+            repo_root, repo_root / "sequence_alignment_paulhondola.zip"
+        )
         print(f"Created Moodle submission archive: {zip_out}")
 
     return 0

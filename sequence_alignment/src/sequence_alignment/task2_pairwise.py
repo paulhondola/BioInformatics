@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from Bio import Align
 import polars as pl
+from Bio import Align
 
 from sequence_alignment.sequences import CDS_SPANS, SequenceRecord
 
@@ -196,7 +196,9 @@ def _seq1_pos_to_col(g1: str, start1_0: int) -> dict[int, int]:
     return mapping
 
 
-def _col_to_seq_starts(g1: str, start1_0: int, g2: str, start2_0: int) -> list[tuple[int, int]]:
+def _col_to_seq_starts(
+    g1: str, start1_0: int, g2: str, start2_0: int
+) -> list[tuple[int, int]]:
     starts: list[tuple[int, int]] = []
     p1, p2 = start1_0, start2_0
     for a, b in zip(g1, g2):
@@ -218,8 +220,6 @@ def _extract_divergence_snippet(
     glob_g1, glob_g2 = global_aln[0], global_aln[1]
     loc_g1, loc_g2 = local_aln[0], local_aln[1]
 
-    glob_s1 = int(global_aln.aligned[0][0][0]) if len(global_aln.aligned[0]) else 0
-    glob_s2 = int(global_aln.aligned[1][0][0]) if len(global_aln.aligned[1]) else 0
     loc_s1 = int(local_aln.aligned[0][0][0]) if len(local_aln.aligned[0]) else 0
     loc_s2 = int(local_aln.aligned[1][0][0]) if len(local_aln.aligned[1]) else 0
 
@@ -247,9 +247,9 @@ def _extract_divergence_snippet(
         l_sub1 = loc_g1[lc : lc + loc_win]
         l_sub2 = loc_g2[lc : lc + loc_win]
         l_gaps = l_sub1.count("-") + l_sub2.count("-")
-        g_gaps = (
-            glob_g1[gc : gc + glob_win].count("-") + glob_g2[gc : gc + glob_win].count("-")
-        )
+        g_gaps = glob_g1[gc : gc + glob_win].count("-") + glob_g2[
+            gc : gc + glob_win
+        ].count("-")
         if g_gaps - l_gaps < 20:
             continue
         l_matches = sum(a == b and a != "-" for a, b in zip(l_sub1, l_sub2))
@@ -261,17 +261,24 @@ def _extract_divergence_snippet(
 
     if best_key is None:
         # Fallback: capture the 3' (or 5') boundary of the local hit where global extends with forced gaps
-        loc_end_p1 = int(local_aln.aligned[0][-1][1]) - 1 if len(local_aln.aligned[0]) else 0
+        loc_end_p1 = (
+            int(local_aln.aligned[0][-1][1]) - 1 if len(local_aln.aligned[0]) else 0
+        )
         boundary_col = glob_map1.get(loc_end_p1, 0)
-        best_glob_col = max(0, min(boundary_col - glob_win // 2, len(glob_g1) - glob_win))
+        best_glob_col = max(
+            0, min(boundary_col - glob_win // 2, len(glob_g1) - glob_win)
+        )
         best_loc_col = max(0, len(loc_g1) - loc_win)
-        if "-" not in glob_g1[best_glob_col : best_glob_col + glob_win] and "-" not in glob_g2[
-            best_glob_col : best_glob_col + glob_win
-        ]:
+        if (
+            "-" not in glob_g1[best_glob_col : best_glob_col + glob_win]
+            and "-" not in glob_g2[best_glob_col : best_glob_col + glob_win]
+        ):
             best_glob_col = max(
-                range(0, max(1, len(glob_g1) - glob_win + 1)),
-                key=lambda c: glob_g1[c : c + glob_win].count("-")
-                + glob_g2[c : c + glob_win].count("-"),
+                range(max(1, len(glob_g1) - glob_win + 1)),
+                key=lambda c: (
+                    glob_g1[c : c + glob_win].count("-")
+                    + glob_g2[c : c + glob_win].count("-")
+                ),
             )
 
     gs1, gs2 = glob_starts[best_glob_col]
@@ -348,7 +355,9 @@ def compare_global_local(
     g_metrics = summarize_alignment(global_aln, "Global")
     l_metrics = summarize_alignment(local_aln, "Local")
     summary_df = pl.DataFrame([metrics_to_row(g_metrics), metrics_to_row(l_metrics)])
-    snippet = _extract_divergence_snippet(rec1.accession, rec2.accession, global_aln, local_aln)
+    snippet = _extract_divergence_snippet(
+        rec1.accession, rec2.accession, global_aln, local_aln
+    )
     cds = CDS_SPANS.get(rec1.accession)
 
     return PairwiseComparison(

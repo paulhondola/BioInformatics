@@ -26,7 +26,11 @@ class SequenceRecord:
 
 
 def _extract_organism(accession: str, description: str) -> str:
-    remainder = description[len(accession) :].strip() if description.startswith(accession) else description.strip()
+    remainder = (
+        description[len(accession) :].strip()
+        if description.startswith(accession)
+        else description.strip()
+    )
     tokens = remainder.split()
     if len(tokens) >= 2:
         return f"{tokens[0]} {tokens[1]}"
@@ -50,7 +54,9 @@ def load_sequences(data_dir: Path) -> list[SequenceRecord]:
             for bio_rec in SeqIO.parse(handle, "fasta"):
                 acc = bio_rec.id.strip()
                 if acc in seen_ids:
-                    raise ValueError(f"Found duplicate accession '{acc}' in {fasta_file.name}")
+                    raise ValueError(
+                        f"Found duplicate accession '{acc}' in {fasta_file.name}"
+                    )
                 seen_ids.add(acc)
 
                 clean_seq = "".join(str(bio_rec.seq).split()).upper()
@@ -75,10 +81,14 @@ def load_sequences(data_dir: Path) -> list[SequenceRecord]:
                 )
 
     if len(records) < 3:
-        raise ValueError(f"Expected at least 3 sequences in {data_path}, found {len(records)}")
+        raise ValueError(
+            f"Expected at least 3 sequences in {data_path}, found {len(records)}"
+        )
 
     order_map = {acc: idx for idx, acc in enumerate(CANONICAL_ORDER)}
-    records.sort(key=lambda r: (order_map.get(r.accession, len(CANONICAL_ORDER)), r.accession))
+    records.sort(
+        key=lambda r: (order_map.get(r.accession, len(CANONICAL_ORDER)), r.accession)
+    )
     return records
 
 

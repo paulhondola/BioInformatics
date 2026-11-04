@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from sequence_alignment.bonus_semiglobal import compare_semiglobal, format_bonus_report
 from sequence_alignment.sequences import SequenceRecord, get_record, load_sequences
 from sequence_alignment.task2_pairwise import compare_global_local, format_task2_report

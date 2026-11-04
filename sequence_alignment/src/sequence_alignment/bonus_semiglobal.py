@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from Bio import Align
 import polars as pl
+from Bio import Align
 
 from sequence_alignment.sequences import SequenceRecord
 from sequence_alignment.task2_pairwise import (

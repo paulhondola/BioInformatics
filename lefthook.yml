@@ -1,0 +1,29 @@
+# Run `lefthook install` once to enable.
+pre-commit:
+  parallel: true
+  jobs:
+    - name: ruff check (fastq_and_ngs)
+      root: fastq_and_ngs/
+      glob: "*.py"
+      run: uvx ruff check {staged_files}
+    - name: ruff format (fastq_and_ngs)
+      root: fastq_and_ngs/
+      glob: "*.py"
+      run: uvx ruff format --check {staged_files}
+    - name: ruff check (sequence_alignment)
+      root: sequence_alignment/
+      glob: "*.py"
+      run: uvx ruff check {staged_files}
+    - name: ruff format (sequence_alignment)
+      root: sequence_alignment/
+      glob: "*.py"
+      run: uvx ruff format --check {staged_files}
+
+pre-push:
+  jobs:
+    - name: pytest (fastq_and_ngs)
+      root: fastq_and_ngs/
+      run: uv run pytest -q
+    - name: pytest (sequence_alignment)
+      root: sequence_alignment/
+      run: uv run pytest -q
