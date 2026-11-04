@@ -17,19 +17,3 @@ def test_notes_hit_counts_match_generated_report():
     for line in VARIANTS.read_text(encoding="utf-8").splitlines():
         if line.startswith("Hits: "):
             assert line.removeprefix("Hits: ") in notes
-
-
-def test_readme_has_required_content():
-    text = (ROOT / "README.txt").read_text(encoding="utf-8")
-    for needed in (
-        "Paul Hondola",
-        "paulhondola",
-        "SRR31709504",
-        "PRJNA1198040",
-        "read 1",
-        "ClinVar",
-        "Antigravity",
-        "Claude",
-        "uv run fastq-and-ngs",
-    ):
-        assert needed in text

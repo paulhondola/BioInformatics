@@ -15,7 +15,7 @@ OUTPUTS = (
     "qc_plot_paulhondola.png",
     "variants_paulhondola.txt",
 )
-FASTQ = "data/work/paulhondola/lab03/your_reads.fastq.gz"
+FASTQ = "data/work/reads.fastq.gz"
 
 
 @pytest.fixture
@@ -98,7 +98,7 @@ def test_corrupt_fastq_returns_error_and_keeps_report(project, capsys):
     fastq.parent.mkdir(parents=True)
     fastq.write_bytes(b"not gzip")
     assert run_tasks(project, "3", False, EMAIL) == 1
-    assert "your_reads" in capsys.readouterr().err
+    assert "reads" in capsys.readouterr().err
     assert report.read_text() == "real report"
 
 

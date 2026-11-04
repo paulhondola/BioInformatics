@@ -1,29 +1,63 @@
 # Run `lefthook install` once to enable.
+# Projects run in parallel; inside each: ruff check --fix -> ruff format -> pytest.
 pre-commit:
-  parallel: true
   jobs:
-    - name: ruff check (fastq_and_ngs)
-      root: fastq_and_ngs/
-      glob: "*.py"
-      run: uvx ruff check {staged_files}
-    - name: ruff format (fastq_and_ngs)
-      root: fastq_and_ngs/
-      glob: "*.py"
-      run: uvx ruff format --check {staged_files}
-    - name: ruff check (sequence_alignment)
-      root: sequence_alignment/
-      glob: "*.py"
-      run: uvx ruff check {staged_files}
-    - name: ruff format (sequence_alignment)
-      root: sequence_alignment/
-      glob: "*.py"
-      run: uvx ruff format --check {staged_files}
-
-pre-push:
-  jobs:
-    - name: pytest (fastq_and_ngs)
-      root: fastq_and_ngs/
-      run: uv run pytest -q
-    - name: pytest (sequence_alignment)
-      root: sequence_alignment/
-      run: uv run pytest -q
+    - group:
+        parallel: true
+        jobs:
+          - name: fastq_and_ngs
+            group:
+              jobs:
+                - name: ruff check --fix
+                  root: fastq_and_ngs/
+                  run: uv run ruff check --fix .
+                  stage_fixed: true
+                - name: ruff format
+                  root: fastq_and_ngs/
+                  run: uv run ruff format .
+                  stage_fixed: true
+                - name: pytest
+                  root: fastq_and_ngs/
+                  run: uv run pytest -q
+          - name: sequence_alignment
+            group:
+              jobs:
+                - name: ruff check --fix
+                  root: sequence_alignment/
+                  run: uv run ruff check --fix .
+                  stage_fixed: true
+                - name: ruff format
+                  root: sequence_alignment/
+                  run: uv run ruff format .
+                  stage_fixed: true
+                - name: pytest
+                  root: sequence_alignment/
+                  run: uv run pytest -q
+          - name: phylogenetics
+            group:
+              jobs:
+                - name: ruff check --fix
+                  root: phylogenetics/
+                  run: uv run ruff check --fix .
+                  stage_fixed: true
+                - name: ruff format
+                  root: phylogenetics/
+                  run: uv run ruff format .
+                  stage_fixed: true
+                - name: pytest
+                  root: phylogenetics/
+                  run: uv run pytest -q
+          - name: clustering
+            group:
+              jobs:
+                - name: ruff check --fix
+                  root: clustering/
+                  run: uv run ruff check --fix .
+                  stage_fixed: true
+                - name: ruff format
+                  root: clustering/
+                  run: uv run ruff format .
+                  stage_fixed: true
+                - name: pytest
+                  root: clustering/
+                  run: uv run pytest -q
