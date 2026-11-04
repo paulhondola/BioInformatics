@@ -159,3 +159,15 @@ def test_refresh_failure_keeps_cache(tmp_path, monkeypatch):
     with pytest.raises(OSError):
         load_or_fetch_hits([RS, NO_ID], cache, refresh=True, email=EMAIL)
     assert cache.read_bytes() == before
+
+
+@pytest.mark.parametrize("reply", ["<PubmedArticleSet/>", "<html><body>502 Bad Gateway</body></html>"])
+def test_refresh_with_wellformed_empty_reply_keeps_cache(tmp_path, monkeypatch, reply):
+    cache = tmp_path / "hits.json"
+    _stub_network(monkeypatch)
+    load_or_fetch_hits([RS], cache, email=EMAIL)
+    before = cache.read_bytes()
+    monkeypatch.setattr(vcf_pubmed, "fetch_articles_xml", lambda pmids, email: reply)
+    with pytest.raises(ValueError, match="no articles"):
+        load_or_fetch_hits([RS], cache, refresh=True, email=EMAIL)
+    assert cache.read_bytes() == before

@@ -77,6 +77,9 @@ def position_dropped(variant: Variant, translation: str) -> bool:
 def _fetch_hit(query: str, email: str) -> dict:
     result = search_pubmed(query, MAX_LISTED, email)
     articles = parse_articles(fetch_articles_xml(result.pmids, email)) if result.pmids else []
+    if result.pmids and not articles:
+        # ponytail: also rejects a result made only of PubMed book records; parse those if it ever happens.
+        raise ValueError(f"PubMed returned no articles for PMIDs {result.pmids} (query {query!r})")
     return {
         "count": result.count,
         "query_translation": result.query_translation,

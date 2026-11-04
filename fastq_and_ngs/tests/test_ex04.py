@@ -94,3 +94,14 @@ def test_write_outputs_creates_report_and_plot(tmp_path):
 @pytest.mark.skipif(not REAL_FASTQ.exists(), reason="FASTQ not present")
 def test_real_fastq_matches_committed_report():
     assert format_qc_report(compute_fastq_stats(REAL_FASTQ)) == REAL_REPORT
+
+
+@pytest.mark.parametrize("name", ["empty.fastq", "empty.fastq.gz"])
+def test_zero_read_file_keeps_report_and_plot(tmp_path, name):
+    report, plot = tmp_path / "report.txt", tmp_path / "plot.png"
+    report.write_text("real report")
+    plot.write_bytes(b"real plot")
+    with pytest.raises(ValueError, match="no reads"):
+        write_qc_outputs(_write(tmp_path, name, ""), report, plot)
+    assert report.read_text() == "real report"
+    assert plot.read_bytes() == b"real plot"

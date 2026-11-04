@@ -100,6 +100,8 @@ def write_qc_plot(stats: FastqStats, out_png: Path) -> Path:
 def write_qc_outputs(fastq: Path, report: Path, plot: Path) -> FastqStats:
     """Compute stats first, so an unreadable FASTQ can never overwrite existing outputs."""
     stats = compute_fastq_stats(fastq)
+    if stats.reads == 0:
+        raise ValueError(f"{fastq} holds no reads; existing QC outputs were kept")
     report_path = Path(report)
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(format_qc_report(stats), encoding="utf-8")
