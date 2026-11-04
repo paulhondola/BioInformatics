@@ -10,7 +10,7 @@ import tempfile
 import zipfile
 from pathlib import Path
 
-from fastq_and_ngs.ex04_fastq_stats import write_qc_outputs
+from fastq_and_ngs.fastq_stats import write_qc_outputs
 from fastq_and_ngs.pubmed_query import (
     DEFAULT_EMAIL,
     HANDLE,
@@ -24,7 +24,7 @@ from fastq_and_ngs.vcf_pubmed import (
     parse_vcf,
 )
 
-FASTQ_RELATIVE: str = f"data/work/{HANDLE}/lab03/your_reads.fastq.gz"
+FASTQ_RELATIVE: str = "data/work/reads.fastq.gz"
 FASTQ_SOURCE: str = (
     "SRR31709504 read 1 (https://www.ebi.ac.uk/ena/browser/view/SRR31709504)"
 )

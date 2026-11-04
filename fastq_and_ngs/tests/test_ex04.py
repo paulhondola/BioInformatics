@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from fastq_and_ngs.ex04_fastq_stats import (
+from fastq_and_ngs.fastq_stats import (
     FastqStats,
     compute_fastq_stats,
     format_qc_report,

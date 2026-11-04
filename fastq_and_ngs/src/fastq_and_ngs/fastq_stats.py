@@ -1,4 +1,4 @@
-"""Exercise 04: FASTQ QC on own reads (report and bonus plot).
+"""FASTQ QC on own reads (report and bonus plot).
 
 Standalone on purpose: imports nothing from the package, so this file also runs on its own.
 Pass --input, --report and --plot when running it outside this project's folders.

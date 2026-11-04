@@ -21,9 +21,3 @@ Without it, the full pipeline warns, skips Task 3 and keeps the existing QC repo
 VCF source
 data/tp53_variants.vcf is built from ClinVar records (GRCh38, accessed 2026-11-04), not the course sample.
 ClinVar IDs: 12351, 12374, 12356, 5031076, 5031067. The last two have no rsID. REF and ALT are forward-strand.
-
-AI disclosure
-- Google Antigravity: earlier help with the ENA API, the FASTQ download and the QC plotting script.
-- Claude (Claude Code): design, implementation of this project and its tests, and a draft of the notes.
-- Verification: automated tests; the FASTQ MD5 was compared with ENA; the QC numbers were recounted separately;
-  variant coordinates were read from ClinVar; PubMed's own query translations were inspected.
