@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
+import time
 from collections import Counter
 from dataclasses import dataclass
 from io import StringIO
 from pathlib import Path
-import time
 
+import requests
 from Bio import AlignIO
 from Bio.Align import MultipleSeqAlignment
-import requests
 
 from sequence_alignment.sequences import SequenceRecord
 
@@ -73,13 +73,21 @@ def _submit_and_poll_ebi_job(
         if state in {"ERROR", "FAILURE", "NOT_FOUND"}:
             raise RuntimeError(f"EBI MSA job {job_id} terminated with status {state}")
         now = time.monotonic()
-        if state == "QUEUED" and queue_timeout_s is not None and (now - start) >= queue_timeout_s:
+        if (
+            state == "QUEUED"
+            and queue_timeout_s is not None
+            and (now - start) >= queue_timeout_s
+        ):
             return None, "QUEUED_STALL"
         if now >= deadline:
-            raise RuntimeError(f"Timed out waiting for EBI MSA job {job_id} (last={state})")
+            raise RuntimeError(
+                f"Timed out waiting for EBI MSA job {job_id} (last={state})"
+            )
         time.sleep(poll_interval_s)
 
-    result_resp = requests.get(f"{base_url}/result/{job_id}/{result_type}", timeout=30.0)
+    result_resp = requests.get(
+        f"{base_url}/result/{job_id}/{result_type}", timeout=30.0
+    )
     if result_resp.status_code != 200:
         raise RuntimeError(
             f"Failed to download EBI MSA result ({result_resp.status_code}) for job {job_id}"
@@ -101,7 +109,7 @@ def fetch_clustalo_msa(
         if clustalo_queue_timeout_s is not None and clustalo_queue_timeout_s < timeout_s
         else None
     )
-    text, outcome = _submit_and_poll_ebi_job(
+    text, _outcome = _submit_and_poll_ebi_job(
         EBI_BASE,
         {
             "email": email,
@@ -144,14 +152,18 @@ def load_or_fetch_msa(
     cache_file = Path(cache_path)
     if refresh or not cache_file.exists():
         raw_aln = fetch_clustalo_msa(records, email=email)
-        msa = _parse_validated_msa(raw_aln, records)  # validate first: a bad reply must not replace the cache
+        msa = _parse_validated_msa(
+            raw_aln, records
+        )  # validate first: a bad reply must not replace the cache
         cache_file.parent.mkdir(parents=True, exist_ok=True)
         cache_file.write_text(raw_aln, encoding="utf-8")
         return msa
     return _parse_validated_msa(cache_file.read_text(encoding="utf-8"), records)
 
 
-def _parse_validated_msa(text: str, records: list[SequenceRecord]) -> MultipleSeqAlignment:
+def _parse_validated_msa(
+    text: str, records: list[SequenceRecord]
+) -> MultipleSeqAlignment:
     """Parse Clustal ``text``, check it holds exactly ``records``, and return them in record order."""
     by_id = {rec.id: rec for rec in AlignIO.read(StringIO(text), "clustal")}
     expected_ids = [rec.accession for rec in records]
@@ -161,7 +173,9 @@ def _parse_validated_msa(text: str, records: list[SequenceRecord]) -> MultipleSe
         )
     for rec in records:
         if str(by_id[rec.accession].seq).replace("-", "").upper() != rec.seq:
-            raise ValueError(f"Ungapped MSA sequence for {rec.accession} differs from its FASTA record")
+            raise ValueError(
+                f"Ungapped MSA sequence for {rec.accession} differs from its FASTA record"
+            )
     return MultipleSeqAlignment([by_id[acc] for acc in expected_ids])
 
 
@@ -181,7 +195,9 @@ def _build_motif(
             consensus_chars.append(rows[0][1][col])
         else:
             non_gaps = [seq[col] for _, seq in rows if seq[col] != "-"]
-            consensus_chars.append(Counter(non_gaps).most_common(1)[0][0] if non_gaps else "-")
+            consensus_chars.append(
+                Counter(non_gaps).most_common(1)[0][0] if non_gaps else "-"
+            )
 
     per_seq_coords: dict[str, tuple[int, int]] = {}
     label_w = max(len(seq_id) for seq_id, _ in rows)
@@ -191,7 +207,9 @@ def _build_motif(
         within = sum(ch != "-" for ch in seq[start:end])
         coord = (before + 1, before + within) if within > 0 else (before, before)
         per_seq_coords[seq_id] = coord
-        excerpt_lines.append(f"{seq_id:<{label_w}}  {seq[start:end]}  {coord[0]}-{coord[1]}")
+        excerpt_lines.append(
+            f"{seq_id:<{label_w}}  {seq[start:end]}  {coord[0]}-{coord[1]}"
+        )
 
     stars = "".join("*" if conserved_flags[c] else " " for c in range(start, end))
     excerpt_lines.append(" " * (label_w + 2) + stars)
@@ -237,7 +255,7 @@ def analyze_msa(alignment: MultipleSeqAlignment, window: int = 45) -> MsaAnalysi
     win = min(window, aln_len)
     best_win_start = 0
     best_win_key = (-1, -1)
-    for s in range(0, max(1, aln_len - win + 1)):
+    for s in range(max(1, aln_len - win + 1)):
         stars = sum(conserved_flags[s : s + win])
         non_gaps = sum(seq[c] != "-" for _, seq in rows for c in range(s, s + win))
         key = (stars, non_gaps)

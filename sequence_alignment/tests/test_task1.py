@@ -1,5 +1,7 @@
 from pathlib import Path
+
 import pytest
+
 from sequence_alignment.sequences import load_sequences
 from sequence_alignment.task1_distances import (
     compute_distances,
@@ -30,7 +32,11 @@ def test_p_distance_is_symmetric_on_tied_alignments():
     a, b = recs["NM_011640.3"], recs["NM_131327.2"]
     fwd = pairwise_p_distance(a.accession, a.seq, b.accession, b.seq)
     rev = pairwise_p_distance(b.accession, b.seq, a.accession, a.seq)
-    assert (fwd.mismatches, fwd.compared_sites) == (rev.mismatches, rev.compared_sites) == (648, 1755)
+    assert (
+        (fwd.mismatches, fwd.compared_sites)
+        == (rev.mismatches, rev.compared_sites)
+        == (648, 1755)
+    )
 
 
 def test_closest_pair_regions_expose_gap_deletion_bias():
