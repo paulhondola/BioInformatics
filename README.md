@@ -18,4 +18,4 @@ uv run <package-name>      # e.g. uv run sequence-alignment
 uv run pytest -v
 ```
 
-Python 3.12+. See each project's README for details (`sequence_alignment/README.txt` is the only one filled in).
+Python 3.12+. See each project's README for details (`sequence_alignment/README.txt` and `fastq_and_ngs/README.txt` are filled in).
