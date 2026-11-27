@@ -116,9 +116,8 @@ def load_or_fetch_clustalo(
 # --- Tree comparison --------------------------------------------------------------------------
 
 WINDOW: int = 30
-MIN_IDENTITY: float = (
-    0.6  # 80% found nothing on 12 species; 60% ~ 3x the 21.5% background
-)
+# 80% found no window on the 12-species MSA; 60% is ~3x the 21.5% background identity.
+MIN_IDENTITY: float = 0.6
 REFERENCE: str = "Homo_sapiens"
 
 
