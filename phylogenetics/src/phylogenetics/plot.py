@@ -24,7 +24,7 @@ GROUP_COLORS: dict[str, str] = {
 }
 
 
-def draw_tree(tree: Tree, out: Path) -> Path:
+def draw_tree(tree: Tree, out: Path, rooting: str = "outgroup") -> Path:
     """Save a branch-length-scaled phylogram of ``tree`` with a group legend to ``out``."""
     color_of = {s.label: GROUP_COLORS[s.group] for s in SPECIES}
     fig, ax = plt.subplots(figsize=(6.4, 4.6))
@@ -35,7 +35,8 @@ def draw_tree(tree: Tree, out: Path) -> Path:
         label_func=lambda c: c.name.replace("_", " ") if c.is_terminal() else None,
         label_colors=lambda name: color_of.get(name.replace(" ", "_"), "black"),
     )
-    ax.set_title("TP53 CDS Neighbor-Joining tree (Jukes-Cantor), fish-rooted")
+    root = "fish-rooted" if rooting == "outgroup" else "midpoint-rooted"
+    ax.set_title(f"TP53 CDS Neighbor-Joining tree (Jukes-Cantor), {root}")
     ax.set_xlabel("Substitutions per site")
     ax.set_ylabel("")
     ax.set_yticks([])

@@ -41,3 +41,21 @@ def test_zip_contents(tmp_path):
         "src/phylogenetics/__main__.py",
     } <= names
     assert not any("__pycache__" in n or n.endswith(".DS_Store") for n in names)
+
+
+def test_plot_title_names_the_rooting(tmp_path, monkeypatch):
+    from io import StringIO
+
+    from Bio import Phylo
+
+    from phylogenetics import plot
+
+    titles = []
+    monkeypatch.setattr(
+        plot.plt, "close", lambda fig: titles.append(fig.axes[0].get_title())
+    )
+    tree = Phylo.read(
+        StringIO("((Homo_sapiens:1,Mus_musculus:1):1,Danio_rerio:1);"), "newick"
+    )
+    plot.draw_tree(tree, tmp_path / "t.png", rooting="midpoint")
+    assert "midpoint" in titles[0] and "fish" not in titles[0]

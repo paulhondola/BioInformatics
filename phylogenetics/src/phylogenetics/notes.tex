@@ -43,12 +43,12 @@ Xtr \emph{Xenopus tropicalis} NM\_001001903.1 (1089), Dre \emph{Danio rerio} NM\
  & \textbf{Hsa} & \textbf{Ptr} & \textbf{Mml} & \textbf{Mmu} & \textbf{Rno} & \textbf{Cfa} & \textbf{Bta} & \textbf{Ssc} & \textbf{Gga} & \textbf{Xtr} & \textbf{Dre} \\ \midrule
 \textbf{Ptr} & .003 &  &  &  &  &  &  &  &  &  &  \\
 \textbf{Mml} & .036 & .037 &  &  &  &  &  &  &  &  &  \\
-\textbf{Mmu} & .194 & .192 & .200 &  &  &  &  &  &  &  &  \\
+\textbf{Mmu} & .194 & .192 & .199 &  &  &  &  &  &  &  &  \\
 \textbf{Rno} & .193 & .190 & .200 & .095 &  &  &  &  &  &  &  \\
-\textbf{Cfa} & .155 & .157 & .163 & .228 & .231 &  &  &  &  &  &  \\
+\textbf{Cfa} & .155 & .156 & .163 & .228 & .231 &  &  &  &  &  &  \\
 \textbf{Bta} & .167 & .169 & .172 & .223 & .249 & .188 &  &  &  &  &  \\
 \textbf{Ssc} & .146 & .146 & .150 & .190 & .212 & .167 & .138 &  &  &  &  \\
-\textbf{Gga} & .401 & .403 & .414 & .443 & .459 & .403 & .403 & .399 &  &  &  \\
+\textbf{Gga} & .401 & .403 & .414 & .443 & .459 & .402 & .403 & .399 &  &  &  \\
 \textbf{Xtr} & .378 & .381 & .379 & .378 & .373 & .383 & .423 & .376 & .414 &  &  \\
 \textbf{Dre} & .420 & .408 & .408 & .419 & .415 & .421 & .430 & .397 & .448 & .423 &  \\
 \textbf{Ola} & .440 & .433 & .448 & .437 & .453 & .486 & .454 & .450 & .537 & .441 & .362 \\
@@ -74,7 +74,7 @@ Cea mai apropiată pereche: \textbf{Hsa–Ptr}, $d=0.0025$ (3/1182 diferențe); 
 \taskheading{Task 3 — Comparație cu Clustal Omega (EBI) și regiuni conservate (3p)}
 MSA online (\texttt{data/clustalo\_msa.aln}) și arborele lui Clustal Omega (\texttt{data/clustalo\_phylotree.nwk}), construit din MSA, independent de aliniamentele noastre pe perechi.
 \textbf{Robinson–Foulds} (bipartiții neînrădăcinate): $RF=2$, normalizat \textbf{0.11} — 8 din 9 bipartiții comune. Singura diferență este poziția broaștei: noi avem \{Gga, Xtr\}, Clustal are \{Dre, Ola, Xtr\}. Ambele metode recuperează primatele, rozătoarele, mamiferele și tetrapodele și ambele pun câinele lângă primate; baza tetrapodelor este partea instabilă a arborelui.
-\textbf{Regiuni conservate:} 266/1236 coloane (21.5\%) sunt identice la toate 12 speciile, dar cel mai lung segment identic are doar 8 nt, deoarece a treia poziție a codonilor variază (mutații sinonime). Am marcat ferestrele de 30 de coloane cu $\geq60\%$ coloane identice (de $\sim$3 ori fondul) — 4 regiuni, toate în domeniul de legare la ADN (codoni $\sim$94–292, coordonate Hsa): \textbf{117–127} (bucla L1, K120), \textbf{169–179} (L2, R175), \textbf{235–258} (L3, M246/R248/R249), \textbf{270–281} (R273, R280) — exact reziduurile care ating ADN-ul și hotspot-urile de mutații din cancer. Sunt conservate prin selecție purificatoare: o substituție aici anulează legarea la ADN, deci funcția de supresor tumoral.
+\textbf{Regiuni conservate:} 266/1236 coloane (21.5\%) sunt identice la toate 12 speciile, dar cel mai lung segment identic are doar 8 nt, deoarece a treia poziție a codonilor variază (mutații sinonime). Am marcat ferestrele de 30 de coloane cu $\geq60\%$ coloane identice (de $\sim$3 ori fondul) — 4 regiuni, toate în domeniul de legare la ADN (codoni $\sim$94–292, coordonate Hsa): \textbf{117–127} (bucla L1, K120), \textbf{169–179} (L2, R175), \textbf{235–258} (L3, M246/R248/R249), \textbf{270–281} (R273, R280) — includ reziduurile care ating ADN-ul și hotspot-urile de mutații din cancer. Sunt conservate prin selecție purificatoare: o substituție aici anulează legarea la ADN, deci funcția de supresor tumoral.
 
 \begin{minipage}[t]{0.47\textwidth}\vspace{0pt}
 \begin{Verbatim}[fontsize=\scriptsize]
@@ -88,7 +88,7 @@ Ola  TTYGAGGTCAGAATCTGTGCTTGCCCGGGGCGGGA
 \end{Verbatim}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.51\textwidth}\vspace{0pt}\raggedright
-\footnotesize Extras din regiunea 270–281 (6 din 12 rânduri; \texttt{*} = identic la toate 12). Tiparul \texttt{** **} arată că pozițiile 1–2 ale codonilor sunt păstrate, iar a treia variază: proteina e conservată mai mult decât ADN-ul (ex. R273 = \texttt{CGT} la mamifere, \texttt{AGA} la Ola — tot arginină).
+\footnotesize Extras din regiunea 270–281 (6 din 12 rânduri; \texttt{*} = identic la toate 12). Tiparul \texttt{** **} arată că pozițiile 1–2 ale codonilor sunt păstrate, iar a treia variază: proteina e conservată mai mult decât ADN-ul (ex. R273 = \texttt{CGT} la om, \texttt{CGN} la celelalte mamifere, \texttt{AGA} la Ola — tot arginină).
 MSA ajută față de perechi: plasează toate secvențele în aceleași coordonate, deci „conservat” înseamnă conservat la toate speciile simultan.
 \end{minipage}
 

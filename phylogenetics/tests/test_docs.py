@@ -31,3 +31,50 @@ def test_notes_numbers_match_the_pipeline():
 
 def test_notes_name_the_saved_tree():
     assert r"tree\_paulhondola.nwk" in NOTES
+
+
+ABBR = {
+    "Homo_sapiens": "Hsa",
+    "Pan_troglodytes": "Ptr",
+    "Macaca_mulatta": "Mml",
+    "Mus_musculus": "Mmu",
+    "Rattus_norvegicus": "Rno",
+    "Canis_lupus_familiaris": "Cfa",
+    "Bos_taurus": "Bta",
+    "Sus_scrofa": "Ssc",
+    "Gallus_gallus": "Gga",
+    "Xenopus_tropicalis": "Xtr",
+    "Danio_rerio": "Dre",
+    "Oryzias_latipes": "Ola",
+}
+
+
+def test_notes_matrix_cells_match_distances():
+    dist = compute_distances(
+        load_or_fetch_dataset(PROJECT_ROOT / "data/tp53_cds.fasta")
+    )
+    for i, label in enumerate(dist.labels[1:], start=1):
+        expected = [f"{v:.3f}"[1:] for v in dist.matrix[i][:i]]
+        row = next(
+            line
+            for line in NOTES.splitlines()
+            if line.startswith(rf"\textbf{{{ABBR[label]}}} &")
+        )
+        cells = [c.strip() for c in row.removesuffix(r"\\").split("&")[1:]]
+        assert cells[:i] == expected, label
+
+
+def test_notes_r273_codon_claim_matches_msa():
+    recs = load_or_fetch_dataset(PROJECT_ROOT / "data/tp53_cds.fasta")
+    aln, _ = load_or_fetch_clustalo(
+        recs,
+        PROJECT_ROOT / "data/clustalo_msa.aln",
+        PROJECT_ROOT / "data/clustalo_phylotree.nwk",
+    )
+    human = next(str(r.seq) for r in aln if r.id == "Homo_sapiens")
+    col = [i for i, ch in enumerate(human) if ch != "-"][(273 - 1) * 3]
+    codon = {r.id: str(r.seq)[col : col + 3] for r in aln}
+    assert codon["Homo_sapiens"] == "CGT" and codon["Oryzias_latipes"] == "AGA"
+    if {codon[m] for m in GROUPS["Mammals"]} != {"CGT"}:
+        assert r"\texttt{CGT} la mamifere" not in NOTES
+        assert r"\texttt{CGT} la om" in NOTES

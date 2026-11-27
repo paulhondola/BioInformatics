@@ -179,7 +179,7 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     if args.task in {"all", "bonus"}:
-        png = draw_tree(nj.tree, results / f"tree_{HANDLE}.png")
+        png = draw_tree(nj.tree, results / f"tree_{HANDLE}.png", rooting=nj.rooting)
         sections.append(f"=== BONUS: tree plot saved to {png} ===")
 
     print("\n\n".join(sections))
