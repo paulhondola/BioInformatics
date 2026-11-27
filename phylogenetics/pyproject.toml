@@ -1,8 +1,8 @@
 [project]
 name = "phylogenetics"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
+description = "Phylogenetics assignment (Lab 04): TP53 CDS distance matrix, NJ tree and Clustal Omega comparison"
+readme = "README.txt"
 authors = [
     { name = "Paul Hondola", email = "paulhondola@gmail.com" }
 ]
@@ -10,6 +10,7 @@ requires-python = ">=3.12"
 dependencies = [
     "biopython>=1.84",
     "matplotlib>=3.9",
+    "requests>=2.31",
 ]
 
 [dependency-groups]
@@ -19,7 +20,10 @@ dev = [
 ]
 
 [project.scripts]
-phylogenetics = "phylogenetics:main"
+phylogenetics = "phylogenetics.__main__:main"
+
+[tool.uv.build-backend]
+module-name = "phylogenetics"
 
 [build-system]
 requires = ["uv_build>=0.13.7,<0.14.0"]
